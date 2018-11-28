@@ -27,16 +27,6 @@ double bernoulli_verossimi(std::vector<double> x, double p)
   return (pow(p, sum) * pow(1-p, (x.size()-sum)));
 }
 
-// double normal_density(std::vector<double> x, double u, double sigma)
-// {
-//   return (1/(sqrt(2*pi*pow(sigma, 2)))) * (pow(e, - pow(x - u, 2)/2*pow(sigma, 2)));
-// }
-//
-// double inverse_gamma_density(std::vector<double> x, double alpha, double beta)
-// {
-//   return (pow(beta, alpha)/std::tgamma(alpha) * pow(x, -alpha - 1) * pow (e, -beta/x));
-// }
-
 void SIR(std::vector<double> x, double alpha, double beta, double J)
 {
   std::vector<double> samples;

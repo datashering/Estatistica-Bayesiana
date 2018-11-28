@@ -28,16 +28,25 @@ int main()
     }
   }
 
+  std::ofstream newfile;
+  newfile.open("bum.csv");
   std::normal_distribution<double> normal_dist(2,5);
   for (int i = 0; i < x_norm.size(); i++)
   {
     x_norm[i] = normal_dist(generato);
   }
+  newfile << x_norm[0];
+  for (int i = 1; i < x_norm.size(); i++)
+  {
+    newfile << ",";
+    newfile << x_norm[i];
+  }
+  newfile.close();
 
   // SIR(x, alpha, beta, 100);
   // Rejection(x, alpha, beta, 2000);
   // Metropolis_Hastings(x, alpha, beta, 100);
-  Gibbs_Sampling(x_norm, 10, 1, 2, 1, 100);
+  Gibbs_Sampling(x_norm, 0, 100, 0.01, 0.01, 100000);
 
   return 0;
 }
