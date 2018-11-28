@@ -9,3 +9,5 @@ void SIR(std::vector<double>, double, double, double);
 void Rejection(std::vector<double>, double, double, double);
 
 void Metropolis_Hastings(std::vector<double>, double, double, double);
+
+void Gibbs_Sampling(std::vector<double>, double, double, double, double, double);

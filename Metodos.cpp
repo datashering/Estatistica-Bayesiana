@@ -4,6 +4,7 @@
 #include <cmath>
 #include <random>
 #include <boost/math/distributions/beta.hpp>
+#include <boost/math/distributions/inverse_gamma.hpp>
 #include "Metodos.h"
 
 std::mt19937 generator(clock());
@@ -25,6 +26,16 @@ double bernoulli_verossimi(std::vector<double> x, double p)
 
   return (pow(p, sum) * pow(1-p, (x.size()-sum)));
 }
+
+// double normal_density(std::vector<double> x, double u, double sigma)
+// {
+//   return (1/(sqrt(2*pi*pow(sigma, 2)))) * (pow(e, - pow(x - u, 2)/2*pow(sigma, 2)));
+// }
+//
+// double inverse_gamma_density(std::vector<double> x, double alpha, double beta)
+// {
+//   return (pow(beta, alpha)/std::tgamma(alpha) * pow(x, -alpha - 1) * pow (e, -beta/x));
+// }
 
 void SIR(std::vector<double> x, double alpha, double beta, double J)
 {
@@ -159,5 +170,56 @@ void Metropolis_Hastings(std::vector<double> x, double alpha, double beta, doubl
     newfile << ",";
   }
 
+  newfile.close();
+}
+
+void Gibbs_Sampling(std::vector<double> x, double m, double V, double a, double b, double T)
+{
+  // boost::math::inverse_gamma_distribution<> mygamma;
+  // std::normal_distribution<double> normal_dist;
+  double randFromUnif;
+
+  std::vector<double> u, sigma;
+  u.resize(T);
+  sigma.resize(T + 1);
+  sigma[0] = 1;
+  double sumsqr, n = x.size(), x_mean = 0;
+
+  for (int i = 0; i < x.size(); i++)
+  {
+    x_mean += x[i];
+  }
+  x_mean = x_mean/x.size();
+
+  for (int i = 0; i < T; i++)
+  {
+    std::normal_distribution<double> normal_dist((m + n*V*x_mean)/(n*V + 1), (sigma[i] * V)/(n*V + 1));
+    u[i] = normal_dist(generator);
+    sumsqr = 0;
+    for (int j = 0; j < x.size(); j++)
+    {
+      sumsqr += pow(x[j] - u[i], 2);
+    }
+    boost::math::inverse_gamma_distribution<> mygamma(a + (n + 1)/2, b + pow(u[i] - m,2)/2*V + sumsqr/2);
+    randFromUnif = distribution(generator);
+    sigma[i + 1] = quantile(mygamma, randFromUnif);
+  }
+
+  std::ofstream newfile;
+  newfile.open("Gibbs_Sampling.csv");
+
+  newfile << u[0];
+  for (int i = 1; i < u.size(); i++)
+  {
+    newfile << ",";
+    newfile << u[i];
+  }
+  newfile << "\n";
+  newfile << sigma[0];
+  for (int i = 1; i < sigma.size();i++)
+  {
+    newfile << ",";
+    newfile << sigma[i];
+  }
   newfile.close();
 }
